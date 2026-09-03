@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package dfsha;
+
+// Servicio DFSha - Hito 1: version monolitica C/S (un solo nodo servidor)
+// Cubre RF1 (gestion del sistema de archivos) y RF2 (transferencia de archivos)
+service DFSService {
+  // RF1: Gestion del sistema de archivos
+  rpc Ls (LsRequest) returns (LsResponse);
+  rpc Mkdir (PathRequest) returns (StatusResponse);
+  rpc Rmdir (PathRequest) returns (StatusResponse);
+  rpc Rm (PathRequest) returns (StatusResponse);
+
+  // RF2: Transferencia de archivos
+  // Send: el cliente sube un archivo mandando un stream de chunks
+  rpc Send (stream FileChunk) returns (StatusResponse);
+  // Receive: el servidor envia el archivo pedido como un stream de chunks
+  rpc Receive (PathRequest) returns (stream FileChunk);
+}
+
+message LsRequest {
+  string path = 1; // ruta absoluta dentro del filesystem virtual del usuario
+}
+
+message DirEntry {
+  string name = 1;
+  bool is_dir = 2;
+  int64 size_bytes = 3;
+}
+
+message LsResponse {
+  bool ok = 1;
+  string message = 2;
+  repeated DirEntry entries = 3;
+}
+
+message PathRequest {
+  string path = 1;
+}
+
+message StatusResponse {
+  bool ok = 1;
+  string message = 2;
+}
+
+message FileChunk {
+  // En el primer mensaje del stream se envia el path; en Send se repite
+  // por simplicidad de implementacion, en Receive solo importa en el request.
+  string path = 1;
+  bytes data = 2;
+}

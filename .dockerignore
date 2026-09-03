@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+server_storage/
+local-files/
+*.log
+*.docx
+*.pdf
+*.jpg
+*.png
+build_doc.js
+.git

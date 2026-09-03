@@ -1,0 +1,33 @@
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    container_name: dfsha-server
+    ports:
+      - "50051:50051"
+    volumes:
+      - dfsha_data:/data
+    networks:
+      - dfsha-net
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: dfsha-client
+    depends_on:
+      - server
+    stdin_open: true   # equivalente a -i, necesario para el shell interactivo
+    tty: true           # equivalente a -t
+    volumes:
+      - ./local-files:/work   # carpeta local para subir/bajar archivos con send/recv
+    networks:
+      - dfsha-net
+
+networks:
+  dfsha-net:
+    driver: bridge
+
+volumes:
+  dfsha_data:
